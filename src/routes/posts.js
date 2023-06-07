@@ -8,7 +8,7 @@ const router = Router();
 const Posts = () => dbClient('posts')
 
 router.get('/', async (req, res) => {
-    logger.info("post");
+    logger.info("posts");
 })
 
 // 게시글 조회
@@ -25,7 +25,7 @@ router.get('/getPosts', async (req, res) => {
 });
   
 // 게시글 등록
-router.post('/create', checkAuth, async (req, res) => {
+router.post('/postPost', checkAuth, async (req, res) => {
     const { title, content } = req.body;
 
     try {

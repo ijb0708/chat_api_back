@@ -2,16 +2,14 @@ import Router from 'express';
 
 import test from './test.js';
 import users from './users.js';
-import rooms from './rooms.js';
-import chatlogs from './chatlogs.js';
+import posts from './posts.js'
 
 const router = Router();
 
 // routes List
 router.use('/test', test);
-// router.use('/users', users);
-// router.use('/rooms', rooms);
-router.use('/chatlogs', chatlogs);
+router.use('/users', users);
+router.use('/posts', posts)
 
 // 에러처리  미들웨어
 app.use((err, req, res, next) => {
