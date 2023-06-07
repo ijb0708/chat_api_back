@@ -1,0 +1,25 @@
+{
+  "name": "chatapiserver",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "./src/server.js",
+  "scripts": {
+    "test": "nodemon ./src/server.js",
+    "start": "node ./src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypto": "^5.4.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "knex": "^2.4.2",
+    "nodemon": "^2.0.21",
+    "pg": "^8.10.0",
+    "winston": "^3.8.2",
+    "winston-daily-rotate-file": "^4.7.1"
+  }
+}
