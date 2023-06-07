@@ -13,8 +13,16 @@ router.get('/', async (req, res) => {
 
 // 게시글 조회
 router.get('/getPosts', async (req, res) => {
+    const { pageNum, pageSize } = req.query
+
+    const offset = (pageNum - 1) * pageSize
     try {
-        const posts = await Posts().select();
+        const posts = await Posts()
+            .select()
+            .orderBy('created_at', 'desc')
+            .limit(pageSize)
+            .offset(offset)
+
         res.json({
             data: posts,
             message: "게시글이 조회되었습니다"
@@ -25,8 +33,8 @@ router.get('/getPosts', async (req, res) => {
 });
   
 // 게시글 등록
-router.post('/postPost', checkAuth, async (req, res) => {
-    const { title, content } = req.body;
+router.post('/regiPost', checkAuth, async (req, res) => {
+    const { title, content } = req.body
 
     try {
         const newPost = await Posts()

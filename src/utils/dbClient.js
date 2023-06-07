@@ -1,6 +1,13 @@
 import knex from 'knex';
 import dotenv from 'dotenv'
 
+const serverType = {
+    local: ".env.local",
+    dev: ".env.dev",
+    prod: ".env.prod"
+}
+
+//NODE_ENV
 dotenv.config({ path: '.env.local' });
 
 export default knex({
