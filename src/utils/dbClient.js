@@ -3,12 +3,6 @@ import dotenv from 'dotenv'
 import redis from 'redis';
 import logger from './logger.js';
 
-const serverType = {
-    local: ".env.local",
-    dev: ".env.dev",
-    prod: ".env.prod"
-}
-
 //NODE_ENV
 dotenv.config({ path: '.env.local' });
 
@@ -29,13 +23,12 @@ const postgreDB = knex({
         //최대 풀 개수
         max: 10
     }
-});
-
+})
 
 // Redis 클라이언트 생성 
 const redisDB = redis.createClient({
-    host: 'localhost', // Redis 호스트
-    port: 6379, // Redis 포트
+    host: process.env.REDIS_DB_HOST, // Redis 호스트
+    port: process.env.REDIS_DB_PORT // Redis 포트
 });
   
 // Redis 클라이언트 연결 이벤트 리스너
