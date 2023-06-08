@@ -9,7 +9,7 @@ const __dirname = path.resolve();
 const server = http.createServer(app);
 
 const env = process.env.NODE_ENV || 'dev';
-const PORT = process.env.NODE_PORT || 80
+const PORT = process.env.NODE_PORT || 8080
 
 server.listen(PORT, () => {
 

@@ -1,84 +1,122 @@
 import Router from 'express';
 import logger from '../utils/logger.js';
-import dbClient from '../utils/dbClient.js';
-import {hashPassword, verifyPassword} from '../globals/bcrypto.js'
+import { postgreDB as dbClient } from '../utils/dbClient.js';
+import { hashPassword, verifyPassword } from '../globals/bcrypt.js'
+import { checkAuth } from '../globals/authorization.js'
 
 const router = Router();
 const Users = () => dbClient('users')
 
 router.get('/', (req, res, next) => {
-    logger.info("");
+    try{
+        logger.info("user info")
+    }catch(err) {
+        logger.err("user info")
+        next(err)
+    }
 })
 
-// root routes
+// 유저 로그인
 router.post('/login', async (req, res, next) => {
+
+    const { user_id, user_password } = req.body
 
     try {
         const userData = await Users()
-            .select('user_passwd')
-            .where('user_id', req.query.user_id)
+            .select()
+            .where('user_id', user_id)
+            .first()
+        
+        if(userData) {
+
+            if( await verifyPassword(user_password, userData.user_password) ) {
+    
+                req.session.user = {
+                    isLogin: true,
+                    user_seq: userData.user_seq,
+                    user_id: userData.user_id
+                }
+    
+                res.status(200).json({
+                    auth: true,
+                    message: "인증이 성공하였습니다."
+                })
+
+            }else {
+    
+                res.status(401).json({
+                    auth: false,
+                    message: "인증이 실패되었습니다."
+                })
+            }
+    
+        }else {
+    
+            res.status(200).json({
+                auth: false,
+                message: "없는 아이디입니다."
+            });
+        }
+
     }catch(err) {
         next(err)
     }
+})
 
-    if(userData) {
+router.get('/logout', async (req, res, next) => {
+    try{
+        delete req.session.user
 
-        if( verifyPassword(req.query.user_passwd, userData.user_passwd) ) {
+        res.status(200).json({
+            isSucc: true,
+            message: "로그아웃이 되었습니다."
+        });
+    }catch(err) {
+        next(err)
+    }
+})
 
-            req.session.user_id = data.user_id
+// 유저 중복체크
+router.get('/userIdDupCheck', async (req, res, next) => {
 
-            res.status(200).json({
-                auth: true,
-                message: "인증이 성공하였습니다."
-            })
+    const { user_id } = req.query
+
+    try {
+        const existingUser = await Users()
+            .where('user_id', user_id)
+            .first()
+        
+        if(existingUser) {
+            res.status(409).json({
+                dupl: true,
+                message: "중복된 아이디입니다."
+            });
         }else {
-
-            res.status(401).json({
-                auth: false,
-                message: "인증이 실패되었습니다."
+            res.status(200).json({
+                dupl: false,
+                message: "중복된아이디가 아닙니다."
             })
         }
 
-    }else {
-
-        res.status(200).json({
-            auth: false,
-            message: "없는 아이디입니다."
-        });
-    }
-
-})
-
-router.get('/userIdDupCheck', async (req, res, next) => {
-    try {
-        const userCount = await Users()
-            .count('user_id')
-            .where('user_id', req.query.user_id)
-            .first()
     }catch(err) {
         next(err)
     }
 
-    if(userCount > 0) {
-        res.status(200).json({
-            dupl: true,
-            message: "중복된 아이디입니다."
-        });
-    }else {
-        res.status(200).json({
-            dupl: false,
-            message: "중복된아이디가 아닙니다."
-        })
-    }
 })                                                                                              
 
-router.get('/register', async (req, res, next) => {
+// 회원가입
+router.post('/register', async (req, res, next) => {
+
+    const { user_id, user_name, user_password } = req.body
+
+    const hashpassword = await hashPassword(user_password)
 
     try {
         await Users()
             .insert({
-                user_id: req.query.user_id,
-                user_name: req.query.user_name
+                user_id: user_id,
+                user_name: user_name,
+                user_password: hashpassword
             })
 
         res.status(201).json({
@@ -88,28 +126,47 @@ router.get('/register', async (req, res, next) => {
     }catch(err) {
         next(err)
     }
-
 })
 
-router.get('/info', async (req, res, next) => {
-    
-    try {
-        const userInfo = await Users()
-            .select('user_id', 'user_name')
-            .where('user_id', req.query.user_id)
+router.get('/info', checkAuth, (req, res, next) => {
+    const { user_id } = req.session.user
+
+    try{
+        res.status(200).json({
+            data: {
+                isLogin: true,
+                user_id: user_id
+            },
+            message: "로그인정보가 조회되었습니다."
+        })
     }catch(err) {
         next(err)
     }
 
-    if(userInfo) {
-        res.status(200).json({
-            data: userInfo,
-            message: "유저정보가 검색되었습니다"
-        })
-    }else {
-        res.status(200).json({
-            message: "유저정보가 없습니다."
-        })
+})
+
+// 유저 정보 조회
+router.get('/search', async (req, res, next) => {
+    
+    const { user_id } = req.query
+
+    try {
+        const userInfo = await Users()
+            .select('user_id', 'user_name')
+            .where('user_id', user_id)
+
+        if(userInfo) {
+            res.status(200).json({
+                data: userInfo,
+                message: "유저정보가 검색되었습니다"
+            })
+        }else {
+            res.status(200).json({
+                message: "유저정보가 없습니다."
+            })
+        }
+    }catch(err) {
+        next(err)
     }
 })
 

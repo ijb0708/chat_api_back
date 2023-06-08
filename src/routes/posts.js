@@ -1,7 +1,7 @@
 import Router from 'express';
 import logger from '../utils/logger.js';
-import dbClient from '../utils/dbClient.js';
-import checkAuth from '../globals/authorization.js'
+import { postgreDB as dbClient } from '../utils/dbClient.js';
+import { checkAuth } from '../globals/authorization.js'
 
 const router = Router();
 
@@ -9,6 +9,7 @@ const Posts = () => dbClient('posts')
 
 router.get('/', async (req, res) => {
     logger.info("posts");
+    next()
 })
 
 // 게시글 조회
@@ -33,16 +34,18 @@ router.get('/getPosts', async (req, res) => {
 });
   
 // 게시글 등록
-router.post('/regiPost', checkAuth, async (req, res) => {
+router.post('/register', checkAuth, async (req, res, next) => {
     const { title, content } = req.body
+    const { user_seq } = req.session.user
 
     try {
         const newPost = await Posts()
             .insert({
                 title: title,
                 content: content,
-                user_id: req.session.user_id
+                create_user_seq: user_seq
             });
+        
         res.status(201).json({
             isSucc: true,
             message: "게시글이 등록 되었습니다."

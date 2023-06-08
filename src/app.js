@@ -2,9 +2,16 @@ import express from 'express';
 // modules
 import bodyParser from 'body-parser';
 import path from 'path';
+import RedisStore from 'connect-redis';
+import dotenv from 'dotenv'
+
 // 설정파일
 import routes from './routes/index.js';
 import session from 'express-session';
+import { redisDB as dbClient } from './utils/dbClient.js';
+
+//NODE_ENV
+dotenv.config({ path: '.env.local' });
 
 const __dirname = path.resolve();
 
@@ -15,28 +22,18 @@ app.use(bodyParser.json());
 
 app.use(
     session({
-        secret: 'zero',
+        secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: true,
         cookie: {
             secure: false
-        }
+        },
+        store: new RedisStore({
+            client: dbClient 
+        })
     })
 )
 
 app.use('/', routes);
-
-// 에러처리  미들웨어
-app.use((err, req, res, next) => {
-
-    console.error(err); // 에러 로깅
-
-    // 클라이언트에게 적절한 에러 응답 전송
-    res.status(500).json({
-        err: err,
-        message: "오류입니다."
-    })
-});
-  
 
 export default app;
