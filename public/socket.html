@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket Client</title>
+  <script>
+    // 웹소켓 클라이언트 코드
+    var socket;
+
+    function connectWebSocket() {
+      socket = new WebSocket("ws://localhost:8080");
+
+      socket.onopen = function(event) {
+        console.log("WebSocket connected");
+      };
+
+      socket.onmessage = function(event) {
+        const message = event.data;
+        document.getElementById("messageOutput").value = message;
+        console.log("Received message: " + message);
+      };
+
+      socket.onclose = function(event) {
+        console.log("WebSocket disconnected");
+      };
+    }
+
+    function sendMessage() {
+      var message = document.getElementById("messageInput").value;
+      socket.send(message);
+    }
+
+    function disconnectWebSocket() {
+      socket.close();
+    }
+  </script>
+</head>
+    <body>
+    <h1>WebSocket Client</h1>
+    <button onclick="connectWebSocket()">Connect</button>
+    <button onclick="disconnectWebSocket()">Disconnect</button>
+    <br>
+    <input type="text" id="messageInput">
+    <button onclick="sendMessage()">Send Message</button>
+    <textarea id="messageOutput" cols="30" rows="10"></textarea>
+    </body>
+</html>

@@ -1,4 +1,4 @@
-import logger from "../utils/logger";
+import logger from "../utils/logger.js";
 
 export const jsonToString = json => {
     try {
@@ -24,3 +24,15 @@ export const jsonToObject = json => {
         return null
     }
 }
+
+export const blobToString = blob => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const text = reader.result;
+        resolve(text);
+      };
+      reader.onerror = reject;
+      reader.readAsText(blob);
+    });
+  }

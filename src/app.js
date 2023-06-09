@@ -24,7 +24,7 @@ app.use(
     session({
         secret: process.env.SESSION_SECRET,
         resave: false,
-        saveUninitialized: true,
+        saveUninitialized: false,
         cookie: {
             secure: false
         },
@@ -33,6 +33,9 @@ app.use(
         })
     })
 )
+
+// public 디렉토리를 정적 파일 경로로 설정
+app.use('/page', express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 

@@ -1,0 +1,58 @@
+<div id="login-container">
+  <h1>Login</h1>
+  <form id="login-form">
+    <div>
+      <label for="user_id">Username:</label>
+      <input type="text" id="user_id" required>
+    </div>
+    <div>
+      <label for="user_password">Password:</label>
+      <input type="password" id="user_password" required>
+    </div>
+    <button type="submit">Login</button>
+  </form>
+  <div id="message"></div>
+</div>
+<script>
+    // 로그인 폼 요소들 가져오기
+    const form = document.getElementById('login-form');
+    const usernameInput = document.getElementById('user_id');
+    const passwordInput = document.getElementById('user_password');
+    const messageDiv = document.getElementById('message');
+
+    // 폼 제출 시 이벤트 핸들러
+    form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+
+    // 서버로 로그인 요청 보내기
+    try {
+        const response = await login(username, password);
+        const data = await response.json();
+
+        if (response.auth) {
+        // 로그인 성공 시 처리
+        messageDiv.textContent = '로그인 성공!';
+        } else {
+        // 로그인 실패 시 처리
+        messageDiv.textContent = data.message || '로그인에 실패했습니다.';
+        }
+    } catch (error) {
+        console.error('로그인 요청 실패:', error);
+        messageDiv.textContent = '로그인 요청에 실패했습니다.';
+    }
+    });
+
+    // 서버로 로그인 요청 보내는 함수
+    function login(user_id, user_password) {
+        return fetch('api/users/login', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id, user_password }),
+        });
+    }
+</script>

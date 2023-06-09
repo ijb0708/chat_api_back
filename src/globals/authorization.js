@@ -1,5 +1,8 @@
+import logger from "../utils/logger.js";
+
 // 세션 인증 확인 함수
 export const checkAuth = (req, res, next) => {
+    logger.info(req.session.user)
     if (req.session.user) {
       // 세션에 사용자 ID가 존재하는 경우
       next(); // 다음 미들웨어 실행

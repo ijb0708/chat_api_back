@@ -21,6 +21,9 @@ router.post('/login', async (req, res, next) => {
 
     const { user_id, user_password } = req.body
 
+    logger.info(user_id)
+    logger.info(user_password)
+
     try {
         const userData = await Users()
             .select()
@@ -37,6 +40,8 @@ router.post('/login', async (req, res, next) => {
                     user_id: userData.user_id
                 }
     
+                logger.info(req.session.user)
+
                 res.status(200).json({
                     auth: true,
                     message: "인증이 성공하였습니다."

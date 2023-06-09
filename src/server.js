@@ -10,16 +10,16 @@ import { handleWebSocket } from './handleWebSocket.js'
 const __dirname = path.resolve();
 
 const server = http.createServer(app);
-const wss = new WebSocketServer({ server })
 
 const env = process.env.NODE_ENV || 'dev';
 const PORT = process.env.NODE_PORT || 8080
 
 dotenv.config({ path: '.env.local' });
 
-wss.on("connection", handleWebSocket)
-
 server.listen(PORT, () => {
 
     console.log('server running ' + PORT);
 });
+
+const wss = new WebSocketServer({ server })
+wss.on("connection", handleWebSocket)
