@@ -1,12 +1,44 @@
 import logger from "../utils/logger.js";
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv'
 
-// 세션 인증 확인 함수
-export const checkAuth = (req, res, next) => {
-    logger.info(req.session.user)
-    if (req.session.user) {
-      // 세션에 사용자 ID가 존재하는 경우
-      next(); // 다음 미들웨어 실행
-    } else {
-      res.status(401).json({ error: "접근 권한이 없습니다." });
+//NODE_ENV
+dotenv.config({ path: '.env.local' });
+
+const secretKey = process.env.TOKEN_SECRET
+logger.info(secretKey)
+
+export const genToken = data => {
+  return jwt.sign(data, secretKey);
+}
+
+// 보호된 라우트에 대한 JWT 검증 미들웨어
+export const authToken = (req, res, next) => {
+  const authorizationHeader = req.headers.authorization
+  if(authorizationHeader && authorizationHeader.startsWith('Bearer ')) {
+    const token = authorizationHeader.substring(7)
+    
+    try {
+      const decoded = jwt.verify(token, secretKey)
+
+      console.log(decoded)
+      req.token = decoded
+      next()
+    }catch(err) {
+      next(err)
     }
   }
+}
+
+export const getTokenData = token => {
+
+  try {
+    const decodedToken = jwt.verify(token, secretKey);
+    console.log(decodedToken)
+    return decodedToken
+  }catch (error) {
+    throw new Error('유효하지 않은 토큰입니다.')
+  } 
+}
+
+

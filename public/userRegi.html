@@ -53,7 +53,7 @@
   
       // 서버로 회원 요청 보내는 함수
       function registerUser(user_id, user_name, user_password) {
-          return fetch('api/users/register', {
+          return fetch('/users/register', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

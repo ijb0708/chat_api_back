@@ -2,7 +2,7 @@ import Router from 'express';
 import logger from '../utils/logger.js';
 import { postgreDB as dbClient } from '../utils/dbClient.js';
 import { hashPassword, verifyPassword } from '../globals/bcrypt.js'
-import { checkAuth } from '../globals/authorization.js'
+import { genToken, authToken } from '../globals/authorization.js'
 
 const router = Router();
 const Users = () => dbClient('users')
@@ -33,16 +33,17 @@ router.post('/login', async (req, res, next) => {
         if(userData) {
 
             if( await verifyPassword(user_password, userData.user_password) ) {
-    
-                req.session.user = {
+
+                const user = {
                     isLogin: true,
                     user_seq: userData.user_seq,
                     user_id: userData.user_id
                 }
     
-                logger.info(req.session.user)
+                const token = genToken(user);
 
                 res.status(200).json({
+                    token: token,
                     auth: true,
                     message: "인증이 성공하였습니다."
                 })
@@ -68,18 +69,18 @@ router.post('/login', async (req, res, next) => {
     }
 })
 
-router.get('/logout', async (req, res, next) => {
-    try{
-        delete req.session.user
+// router.get('/logout', async (req, res, next) => {
+//     try{
+//         // delete req.session.user
 
-        res.status(200).json({
-            isSucc: true,
-            message: "로그아웃이 되었습니다."
-        });
-    }catch(err) {
-        next(err)
-    }
-})
+//         res.status(200).json({
+//             isSucc: true,
+//             message: "로그아웃이 되었습니다."
+//         });
+//     }catch(err) {
+//         next(err)
+//     }
+// })
 
 // 유저 중복체크
 router.get('/userIdDupCheck', async (req, res, next) => {
@@ -133,8 +134,10 @@ router.post('/register', async (req, res, next) => {
     }
 })
 
-router.get('/info', checkAuth, (req, res, next) => {
-    const { user_id } = req.session.user
+router.get('/info', authToken, (req, res, next) => {
+
+    console.log(req.token)
+    const { user_id, user_seq, isLogin } = req.token
 
     try{
         res.status(200).json({

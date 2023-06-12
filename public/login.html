@@ -14,6 +14,9 @@
   <div id="message"></div>
 </div>
 <script>
+    cookie: {
+    	httpOnly: true
+    }
     // 로그인 폼 요소들 가져오기
     const form = document.getElementById('login-form');
     const usernameInput = document.getElementById('user_id');
@@ -32,12 +35,16 @@
         const response = await login(username, password);
         const data = await response.json();
 
-        if (response.auth) {
-        // 로그인 성공 시 처리
-        messageDiv.textContent = '로그인 성공!';
+        if (data.auth) {
+
+        //   // 로그인 성공 시 처리
+          messageDiv.textContent = '로그인 성공!';
+
+        //   // 토큰값 저장
+          localStorage.setItem('token', data.token);
         } else {
-        // 로그인 실패 시 처리
-        messageDiv.textContent = data.message || '로그인에 실패했습니다.';
+          // 로그인 실패 시 처리
+          messageDiv.textContent = data.message || '로그인에 실패했습니다.';
         }
     } catch (error) {
         console.error('로그인 요청 실패:', error);
@@ -47,10 +54,10 @@
 
     // 서버로 로그인 요청 보내는 함수
     function login(user_id, user_password) {
-        return fetch('api/users/login', {
-            method: 'POST',
+        return fetch('/users/login', {
+            method: 'post',
             headers: {
-            'Content-Type': 'application/json',
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({ user_id, user_password }),
         });

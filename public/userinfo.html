@@ -10,8 +10,14 @@
   <div id="result"></div>
 
   <script>
+
     function fetchUserInfo() {
-      fetch('/api/users/info')
+      const token = localStorage.getItem('token');
+      fetch('/users/info', {
+        headers: {
+          'Authorization': `Bearer ${token}` // Authorization 헤더에 JWT 토큰을 포함
+        }
+      })
         .then(response => response.json())
         .then(data => {
           // API 응답 결과 처리
@@ -29,18 +35,21 @@
 
     // 서버로 로그인 요청 보내는 함수
     function logiout() {
-        fetch('api/users/logout')
-          .then(response => response.json())
-          .then(data => {
-            // API 응답 결과 처리
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = JSON.stringify(data);
-          })
-          .catch(error => {
-            console.error('API 요청 중 오류 발생:', error);
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = 'API 요청 오류';
-          });
+      localStorage.removeItem('token')
+      resultDiv.innerHTML = "로그아웃이 되었습니다"
+
+        // fetch('api/users/logout')
+        //   .then(response => response.json())
+        //   .then(data => {
+        //     // API 응답 결과 처리
+        //     const resultDiv = document.getElementById('result');
+        //     resultDiv.innerHTML = JSON.stringify(data);
+        //   })
+        //   .catch(error => {
+        //     console.error('API 요청 중 오류 발생:', error);
+        //     const resultDiv = document.getElementById('result');
+        //     resultDiv.innerHTML = 'API 요청 오류';
+        //   });
     }
   </script>
 </body>

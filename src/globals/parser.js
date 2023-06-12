@@ -1,4 +1,5 @@
 import logger from "../utils/logger.js";
+import { URLSearchParams } from 'url';
 
 export const jsonToString = json => {
     try {
@@ -10,11 +11,11 @@ export const jsonToString = json => {
     }
 }
   
-  /**
-   * JSON -> Object 형 변환
-   * @param {*} json 형 변환하고자 하는 객체
-   * @returns
-   */
+/**
+ * JSON -> Object 형 변환
+ * @param {*} json 형 변환하고자 하는 객체
+ * @returns
+ */
 export const jsonToObject = json => {
     try {
         if (typeof json === "string") return JSON.parse(json)
@@ -24,15 +25,3 @@ export const jsonToObject = json => {
         return null
     }
 }
-
-export const blobToString = blob => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const text = reader.result;
-        resolve(text);
-      };
-      reader.onerror = reject;
-      reader.readAsText(blob);
-    });
-  }

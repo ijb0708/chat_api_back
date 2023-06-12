@@ -1,7 +1,7 @@
 import Router from 'express';
 import logger from '../utils/logger.js';
 import { postgreDB as dbClient } from '../utils/dbClient.js';
-import { checkAuth } from '../globals/authorization.js'
+import { authToken } from '../globals/authorization.js'
 
 const router = Router();
 
@@ -34,7 +34,7 @@ router.get('/getPosts', async (req, res) => {
 });
   
 // 게시글 등록
-router.post('/register', checkAuth, async (req, res, next) => {
+router.post('/register', authToken, async (req, res, next) => {
     const { title, content } = req.body
     const { user_seq } = req.session.user
 

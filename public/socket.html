@@ -7,7 +7,8 @@
     var socket;
 
     function connectWebSocket() {
-      socket = new WebSocket("ws://localhost:8080");
+      const token = localStorage.getItem('token')
+      socket = new WebSocket("ws://localhost:8080?token=" + token)
 
       socket.onopen = function(event) {
         console.log("WebSocket connected");
@@ -16,7 +17,8 @@
       socket.onmessage = function(event) {
         const message = event.data;
         document.getElementById("messageOutput").value = message;
-        console.log("Received message: " + message);
+        console.log("Received message::: ");
+        console.log(message);
       };
 
       socket.onclose = function(event) {
@@ -35,12 +37,12 @@
   </script>
 </head>
     <body>
-    <h1>WebSocket Client</h1>
-    <button onclick="connectWebSocket()">Connect</button>
-    <button onclick="disconnectWebSocket()">Disconnect</button>
-    <br>
-    <input type="text" id="messageInput">
-    <button onclick="sendMessage()">Send Message</button>
-    <textarea id="messageOutput" cols="30" rows="10"></textarea>
+      <h1>WebSocket Client</h1>
+      <button onclick="connectWebSocket()">Connect</button>
+      <button onclick="disconnectWebSocket()">Disconnect</button>
+      <br>
+      <input type="text" id="messageInput">
+      <button onclick="sendMessage()">Send Message</button>
+      <textarea id="messageOutput" cols="30" rows="10"></textarea>
     </body>
 </html>
