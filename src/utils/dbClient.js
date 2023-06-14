@@ -2,8 +2,17 @@ import knex from 'knex';
 import dotenv from 'dotenv'
 import logger from './logger.js';
 
-//NODE_ENV
-dotenv.config({ path: '.env.local' });
+let path
+switch (process.env.NODE_ENV) {
+    case "local":
+        path = `.env.local`;
+        break;
+    default:
+        break;
+}
+dotenv.config({
+    path:path
+})
 
 const postgreDB = knex({
     client: 'pg',

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>방</title>
+  <style>
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .pagination a {
+      padding: 5px 10px;
+      margin: 0 5px;
+      text-decoration: none;
+      color: #000;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .pagination a.active {
+      background-color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>방정보</h1>
+
+    <div id="rooms_select"></div><br>
+    <div id="pagination" class="pagination"></div>
+
+    <div>
+        <label for="room_name">room_name:</label>
+        <input type="text" id="room_name" required>
+        <button onclick="regiRoom()">방생성</button>
+        <!-- <button onclick="outRoom()">방에서나가기</button> -->
+    </div>
+    <div id="result"></div>
+
+    <br><br><br>
+
+    <textarea id="messageOutput" cols="30" rows="10" readonly></textarea>
+    <br>
+    <input type="text" id="messageInput">
+    <button onclick="sendMessage()">Send Message</button>
+
+  <script>
+
+    const roomNameInput = document.getElementById('room_name');
+    const roomSelectInput = document.getElementById('rooms_select');
+    const paginationContainer = document.getElementById('pagination');
+    const messageOutputContainer = document.getElementById('messageOutput');
+    const messageInputContainer = document.getElementById('messageInput');
+    
+    const itemsPerPage = 5;
+    let currentPage = 1;
+    let pageTotal = 0;
+
+    let socket;
+
+    async function enterRoom(room_seq) {
+
+        try{
+            console.log(room_seq)
+            const token = localStorage.getItem('token');
+            const response = await fetch('/rooms/enterRoom', {
+                method: 'post',
+                headers: {
+                    'Authorization': `Bearer ${token}`, // Authorization 헤더에 JWT 토큰을 포함
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ room_seq:room_seq }),
+            })
+            const returnData = await response.json()
+
+            console.log("success:::")
+            console.log(returnData)
+            localStorage.setItem("room_access_token", returnData.room_access_token)
+
+        }catch(err) {
+            console.error('API 요청 중 오류 발생:', err);
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'API 요청 오류';
+        }
+
+        connectWebSocket()
+
+    }
+
+    async function pageSelect(page)  {
+        const response = await fetch('/rooms/listRooms?pageNum=' + page + '&pageSize=5', {
+            method: 'GET',
+        })
+        const retrunData = await response.json();
+
+        // 결과 표시
+        // roomSelectInput.innerHTML = retrunData.data.rooms.map(item => `<div>${item.room_name},</div>`).join('');
+
+        const rooms = retrunData.data.rooms
+        let roomList=""
+        for(var i=0; i<rooms.length; i++) {
+            var item = rooms[i]
+            roomList+=
+                "<p>"
+                    + ((i+1)+(currentPage-1)*5) +"-"
+                    +item.room_name
+                    +"<input type='button' value='입장' onClick=enterRoom(" + item.room_seq + ")>"
+                +"</p>"
+        }
+        roomSelectInput.innerHTML=roomList
+
+        pageTotal = retrunData.data.total
+        renderPagination();
+
+    }
+
+    // 페이징 생성 및 이벤트 핸들링
+    function renderPagination() {
+      const totalPages = Math.ceil(pageTotal / itemsPerPage);
+
+      // 페이징 컨테이너 초기화
+      paginationContainer.innerHTML = '';
+
+      // 이전 페이지 링크 생성
+      if (currentPage > 1) {
+        const prevLink = createPaginationLink(currentPage - 1, 'Previous');
+        paginationContainer.appendChild(prevLink);
+      }
+
+      // 페이지 링크 생성
+      for (let page = 1; page <= totalPages; page++) {
+        const pageLink = createPaginationLink(page, page.toString());
+        if (page === currentPage) {
+          pageLink.classList.add('active');
+        }
+        paginationContainer.appendChild(pageLink);
+      }
+
+      // 다음 페이지 링크 생성
+      if (currentPage < totalPages) {
+        const nextLink = createPaginationLink(currentPage + 1, 'Next');
+        paginationContainer.appendChild(nextLink);
+      }
+    }
+
+    // 페이지 링크 생성
+    function createPaginationLink(page, text) {
+        const link = document.createElement('a');
+        link.href = '#';
+        link.innerText = text;
+        link.addEventListener('click', () => {
+            currentPage = page;
+            pageSelect(page)
+        });
+        return link;
+    }
+
+    function regiRoom() {
+
+        const room_name = roomNameInput.value;
+        const token = localStorage.getItem('token');
+
+        fetch('/rooms/register', {
+            method: 'post',
+            headers: {
+                'Authorization': `Bearer ${token}`, // Authorization 헤더에 JWT 토큰을 포함
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ room_name:"test" }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // API 응답 결과 처리
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = JSON.stringify(data);
+        })
+        .catch(error => {
+            console.error('API 요청 중 오류 발생:', error);
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'API 요청 오류';
+        });
+    }
+
+    // 서버로 로그인 요청 보내는 함수
+    function outRoom() {
+        localStorage.removeItem('room_access_token')
+        resultDiv.innerHTML = "로그아웃이 되었습니다"
+    }
+
+    function connectWebSocket() {
+
+        messageOutputContainer.append("연결중입니다.\n")
+        const token = localStorage.getItem('room_access_token')
+        socket = new WebSocket("ws://localhost:8080?token=" + token)
+
+        socket.onopen = function(event) {
+            console.log("WebSocket connected");
+            messageOutputContainer.append("연결에 성공했습니다.\n")
+        };
+
+        socket.onmessage = function(event) {
+
+            const returnData = JSON.parse(event.data);
+            console.log("Received message::: ");
+            console.log(returnData)
+            messageOutputContainer.append(returnData.sendUser + " : " + returnData.content + "\n")
+        };
+
+        socket.onclose = function(event) {
+            console.log("WebSocket disconnected");
+            messageOutputContainer.append("연결에 끊어졋습니다.\n")
+        };
+    }
+
+    function sendMessage() {
+
+        socket.send(messageInputContainer.value)
+        messageOutputContainer.append("나 : " + messageInputContainer.value + "\n")
+        messageInputContainer.value = ""
+    }
+
+    function disconnectWebSocket() {
+        socket.close();
+    }
+
+    pageSelect(1)
+  </script>
+</body>
+</html>

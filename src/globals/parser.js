@@ -25,3 +25,12 @@ export const jsonToObject = json => {
         return null
     }
 }
+
+export const getTokenFromQueryString = (queryString) => {
+    const tokenMatch = queryString.match(/[?&]token=([^&]+)/);
+    if (tokenMatch) {
+      return tokenMatch[1];
+    } else {
+      return null;
+    }
+  }

@@ -5,8 +5,8 @@
   "description": "",
   "main": "./src/server.js",
   "scripts": {
-    "test": "nodemon ./src/server.js",
-    "start": "node ./src/server.js"
+    "test": "NODE_ENV=local NODE_PORT=8080 TOKEN_SECRET=zero nodemon ./src/server.js",
+    "local": "NODE_ENV=local NODE_PORT=8080 TOKEN_SECRET=zero node ./src/server.js"
   },
   "keywords": [],
   "author": "",

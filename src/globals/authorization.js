@@ -1,12 +1,7 @@
 import logger from "../utils/logger.js";
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv'
-
-//NODE_ENV
-dotenv.config({ path: '.env.local' });
 
 const secretKey = process.env.TOKEN_SECRET
-logger.info(secretKey)
 
 export const genToken = data => {
   return jwt.sign(data, secretKey);
@@ -21,7 +16,6 @@ export const authToken = (req, res, next) => {
     try {
       const decoded = jwt.verify(token, secretKey)
 
-      console.log(decoded)
       req.token = decoded
       next()
     }catch(err) {

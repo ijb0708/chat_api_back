@@ -8,9 +8,6 @@ import dotenv from 'dotenv'
 // 설정파일
 import routes from './routes/index.js';
 
-//NODE_ENV
-dotenv.config({ path: '.env.local' });
-
 const __dirname = path.resolve();
 
 const app = express();

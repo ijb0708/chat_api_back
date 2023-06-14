@@ -36,7 +36,7 @@ router.get('/getPosts', async (req, res) => {
 // 게시글 등록
 router.post('/register', authToken, async (req, res, next) => {
     const { title, content } = req.body
-    const { user_seq } = req.session.user
+    // const { user_seq } = req.session.user
 
     try {
         const newPost = await Posts()

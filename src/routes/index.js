@@ -3,14 +3,16 @@ import Router from 'express';
 import test from './test.js';
 import users from './users.js';
 import posts from './posts.js'
+import rooms from './rooms.js'
 import logger from '../utils/logger.js';
 
 const router = Router();
 
 // routes List
-router.use('/test', test);
-router.use('/users', users);
+router.use('/test', test)
+router.use('/users', users)
 router.use('/posts', posts)
+router.use('/rooms', rooms)
 
 router.use('/', (req, res, next) => {
     try {
