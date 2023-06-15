@@ -1,17 +1,18 @@
 import Router from 'express';
-import logger from '../utils/logger.js';
-import { postgreDB as dbClient } from '../utils/dbClient.js';
-import { hashPassword, verifyPassword } from '../globals/bcrypt.js'
-import { genToken, authToken } from '../globals/authorization.js'
+import logger from '../utils/logger/index.js';
+import { postgresClient } from '../utils/dbClient/index.js';
+import global from '../global/index.js'
+import middleware from '../middleware/index.js';
+
+const { authToken } = middleware
 
 const router = Router();
-const Users = () => dbClient('users')
+const Users = () => postgresClient('users')
 
 router.get('/', (req, res, next) => {
     try{
         logger.info("user info")
     }catch(err) {
-        logger.err("user info")
         next(err)
     }
 })
@@ -29,7 +30,7 @@ router.post('/login', async (req, res, next) => {
         
         if(userData) {
 
-            if( await verifyPassword(user_password, userData.user_password) ) {
+            if( await global.verifyPassword(user_password, userData.user_password) ) {
 
                 const user = {
                     isLogin: true,
@@ -38,7 +39,7 @@ router.post('/login', async (req, res, next) => {
                     user_name: userData.user_name,
                 }
     
-                const token = genToken(user);
+                const token = global.genToken(user);
 
                 res.status(200).json({
                     token: token,
@@ -113,7 +114,7 @@ router.post('/register', async (req, res, next) => {
 
     const { user_id, user_name, user_password } = req.body
 
-    const hashpassword = await hashPassword(user_password)
+    const hashpassword = await global.hashPassword(user_password)
 
     try {
         await Users()

@@ -1,11 +1,13 @@
 import Router from 'express';
-import logger from '../utils/logger.js';
-import { postgreDB as dbClient } from '../utils/dbClient.js';
-import { authToken } from '../globals/authorization.js'
+import logger from '../utils/logger/index.js';
+import { postgresClient } from '../utils/dbClient/index.js';
+import middleware from '../middleware/index.js'
+
+const { authToken } = middleware
 
 const router = Router();
 
-const Posts = () => dbClient('posts')
+const Posts = () => postgresClient('posts')
 
 router.get('/', async (req, res) => {
     logger.info("posts");

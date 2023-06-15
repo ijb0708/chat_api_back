@@ -1,18 +1,20 @@
 import Router from 'express';
-import logger from '../utils/logger.js';
-import { postgreDB as dbClient } from '../utils/dbClient.js';
-import { authToken, genToken } from '../globals/authorization.js'
+import logger from '../utils/logger/index.js';
+import { postgresClient } from '../utils/dbClient/index.js';
+import global from '../global/index.js'
+import middleware from '../middleware/index.js';
+
+const { authToken } = middleware
 
 const router = Router();
 
-const Rooms = () => dbClient('rooms')
+const Rooms = () => postgresClient('rooms')
 
 router.get('/', async (req, res, next) => {
     logger.info("rooms");
     next()
 })
   
-// 게시글 등록
 router.post('/register', authToken, async (req, res, next) => {
     const { user_seq } = req.token
     const { room_name } = req.body
@@ -77,7 +79,7 @@ router.post('/enterRoom', authToken, async(req, res, next) => {
 
             res.status(200).json({
                 isSucc: true,
-                room_access_token: genToken({
+                room_access_token: global.genToken({
                     isSucc: true,
                     room_seq: room_seq,
                     user_id: user_id,

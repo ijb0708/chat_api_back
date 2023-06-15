@@ -1,14 +1,15 @@
 import Router from 'express';
-import logger from '../utils/logger.js';
-import { authToken } from '../globals/authorization.js'
-import jwt from 'jsonwebtoken';
-import { postgreDB as dbClient } from '../utils/dbClient.js';
+import logger from '../utils/logger/index.js';
+import middleware from '../middleware/index.js'
+import { postgresClient } from '../utils/dbClient/index.js';
+
+const { authToken } = middleware
 
 const secretKey = "12341324"
 
 const router = Router();
 
-const Rooms = () => dbClient('rooms')
+const Rooms = () => postgresClient('rooms')
 
 router.get('/', (req, res) => {
   logger.info("dommy!!");

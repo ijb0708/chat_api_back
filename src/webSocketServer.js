@@ -1,6 +1,6 @@
-import logger from "./utils/logger.js"
-import { getTokenData } from "./globals/authorization.js"
-import { getTokenFromQueryString, jsonToString, jsonToObject } from "./globals/parser.js"
+import logger from "./utils/logger/index.js"
+import { getTokenData } from "./global/author.js"
+import { getTokenFromQueryString, jsonToString, jsonToObject } from "./global/parser.js"
 import { WebSocketServer } from 'ws'
 
 let wss;
@@ -38,7 +38,7 @@ export default (server) => {
             logger.info(message.toString())
 
             sendTextToRoom(webSocket, message.toString())
-        });
+        })
     
         // 4) 에러 처러
         webSocket.on('error', (error)=>{

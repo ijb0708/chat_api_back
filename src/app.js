@@ -3,7 +3,6 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import path from 'path';
 // import RedisStore from 'connect-redis';
-import dotenv from 'dotenv'
 
 // 설정파일
 import routes from './routes/index.js';

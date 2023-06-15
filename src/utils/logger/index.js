@@ -1,5 +1,5 @@
 import {createLogger, format, transports} from 'winston';
-import winstonDaily from 'winston-daily-rotate-file';
+import logFileSetting from './logFileSetting.js';
 
 export default createLogger({
     format : format.combine(
@@ -12,14 +12,7 @@ export default createLogger({
     ),
     transports : [
         // info 레벨 로그를 저장할 파일 설정
-        new winstonDaily({
-            level: 'info',
-            datePattern: 'YYYY-MM-DD',
-            dirname: "./logs",
-            filename: `info_%DATE%.log`,
-            maxFiles: 30,  // 로그파일 저장기간
-            zippedArchive: true, 
-        }),
+        logFileSetting,
         new transports.Console({
             handleExceptions : true
         })

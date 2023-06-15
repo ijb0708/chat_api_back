@@ -1,5 +1,4 @@
-import logger from "../utils/logger.js";
-import { URLSearchParams } from 'url';
+import logger from "../utils/logger/index.js";
 
 export const jsonToString = json => {
     try {
@@ -29,8 +28,8 @@ export const jsonToObject = json => {
 export const getTokenFromQueryString = (queryString) => {
     const tokenMatch = queryString.match(/[?&]token=([^&]+)/);
     if (tokenMatch) {
-      return tokenMatch[1];
+        return tokenMatch[1];
     } else {
-      return null;
+        return null;
     }
-  }
+}
