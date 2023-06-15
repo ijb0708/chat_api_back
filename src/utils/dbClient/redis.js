@@ -5,7 +5,7 @@ const config = {
     host: process.env.REDIS_DB_HOST,
     port: process.env.REDIS_DB_PORT,
     db: process.env.REDIS_DB_DATABASE,
-    // password: process.env.REDIS_DB_PASSWORD
+    password: process.env.REDIS_DB_PASSWORD
 }
 
 const redisClient = createClient(config)
