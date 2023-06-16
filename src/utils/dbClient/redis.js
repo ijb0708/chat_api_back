@@ -1,14 +1,17 @@
-import { createClient } from 'redis'
+import redis from 'redis'
 import logger from '../logger/index.js'
 
 const config = {
-    host: process.env.REDIS_DB_HOST,
-    port: process.env.REDIS_DB_PORT,
-    db: process.env.REDIS_DB_DATABASE,
-    password: process.env.REDIS_DB_PASSWORD
-}
+    legacyMode: true, 
+    db: process.env.REDIS_DATABASE,
+    password: process.env.REDIS_PASSWORD,
+    socket: {
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT,
+    }
+} 
 
-const redisClient = createClient(config)
+const redisClient = redis.createClient(config);
 
 redisClient.on('connect', () => {
     logger.info("[Redis] : 연결완료")
@@ -20,4 +23,4 @@ redisClient.on('error', err => {
 
 redisClient.connect()
 
-export default redisClient
+export default redisClient.v4

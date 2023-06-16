@@ -2,11 +2,11 @@ import knex from 'knex';
 import logger from '../logger/index.js';
 
 const config = {
-    user : process.env.POSTGRE_DB_USER,
-    password : process.env.POSTGRE_DB_PASSWORD,
-    database : process.env.POSTGRE_DB_DATABASE,
-    host : process.env.POSTGRE_DB_HOST,
-    port : process.env.POSTGRE_DB_PORT,
+    user : process.env.POSTGRE_USER,
+    password : process.env.POSTGRE_PASSWORD,
+    database : process.env.POSTGRE_DATABASE,
+    host : process.env.POSTGRE_HOST,
+    port : process.env.POSTGRE_PORT,
 }
 
 const postgresClient = knex({
@@ -26,7 +26,7 @@ postgresClient.raw('SELECT 1')
     .then(() => {
         logger.info("[Postgres] : 연결완료")
     })
-    .catch((error) => {
+    .catch((err) => {
         logger.info("[Postgres] : 에러" + err)
     })
 
